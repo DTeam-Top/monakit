@@ -1,0 +1,254 @@
+import { type CardTheme, KNOWLEDGE_CARD_THEME } from "@/consts";
+import { DEFAULT_KNOWLEDGE_CARD_THEME } from "@/themes/knowledge-card-themes";
+import { type ClassValue, clsx } from "clsx";
+import type React from "react";
+import { twMerge } from "tailwind-merge";
+
+const publicCardImages = import.meta.glob<string>("/public/cards/*.png", {
+  query: "?inline",
+  import: "default",
+});
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+
+export function getFileNameWithoutExtension(fileBaseName: string): string {
+  return fileBaseName.split(".").slice(0, -1).join(".");
+}
+
+export function truncateText(text: string, length = 80) {
+  return text.length > length ? `${text.substring(0, length)}...` : text;
+}
+
+export function splitCurrentKey(currentKey: string) {
+  const [email, date, topic, title] = currentKey.split("/");
+  return { email, date, topic, title };
+}
+
+export function truncateMiddle(str: string): string {
+  if (!str || str.length <= 6) {
+    return str;
+  }
+
+  return `${str.substring(0, 3)}...${str.substring(str.length - 3)}`;
+}
+
+export function formatDate(dateString: string | Date): string {
+  return new Date(dateString).toLocaleDateString("en-us", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+export function parseStartDate(dateString: string | null): Date | undefined {
+  if (!dateString) return undefined;
+  const date = new Date(dateString);
+  date.setHours(0, 0, 0, 0);
+  return date;
+}
+
+export function parseEndDate(dateString: string | null): Date | undefined {
+  if (!dateString) return undefined;
+  const date = new Date(dateString);
+  date.setHours(23, 59, 59, 999);
+  return date;
+}
+
+
+
+export async function loadPako(mermaidMarkdown: string) {
+  try {
+    const { deflate } = await import("pako");
+    const { fromUint8Array } = await import("js-base64");
+
+    const cleanedText = cleanText(mermaidMarkdown);
+    const json = JSON.stringify({ code: cleanedText });
+    const structureText = parseMindmapToJson(cleanedText);
+    const encodeData = new TextEncoder().encode(json);
+    const compressed = deflate(encodeData, { level: 9 });
+    const base64 = fromUint8Array(compressed, true);
+    return {
+      pakoValue: base64,
+      structureText: structureText,
+      cleanedText: cleanedText,
+    };
+  } catch (error) {
+    console.error("Error", error);
+  }
+}
+
+
+
+export function parseMindmapToJson(text: string): {
+  root: string;
+  branches: Array<{
+    title: string;
+    subBranches: Array<{ title: string; leaves: string[] }>;
+  }>;
+} {
+  const lines = text.split("\n").filter((line) => line.trim());
+  const result = {
+    root: "",
+    branches: [] as Array<{
+      title: string;
+      subBranches: Array<{ title: string; leaves: string[] }>;
+    }>,
+  };
+
+  let currentBranch: {
+    title: string;
+    subBranches: Array<{ title: string; leaves: string[] }>;
+  } | null = null;
+  let currentSubBranch: { title: string; leaves: string[] } | null = null;
+
+  for (const line of lines) {
+    const trimmedLine = line.trim();
+
+    if (trimmedLine === "mindmap") {
+      continue;
+    }
+
+    if (trimmedLine.includes("root((")) {
+      const rootMatch = trimmedLine.match(/root\(\(([^)]+)\)\)/);
+      if (rootMatch) {
+        result.root = rootMatch[1].trim();
+      }
+      continue;
+    }
+
+    const indentLevel = line.length - line.trimStart().length;
+
+    if (indentLevel === 4) {
+      // Level 1 branch
+      const title = trimmedLine;
+      currentBranch = { title, subBranches: [] };
+      currentSubBranch = null;
+      result.branches.push(currentBranch);
+    } else if (indentLevel === 6 && currentBranch) {
+      // Level 2 sub-branch
+      const title = trimmedLine;
+      currentSubBranch = { title, leaves: [] };
+      currentBranch.subBranches.push(currentSubBranch);
+    } else if (indentLevel === 8 && currentSubBranch) {
+      // Level 3 leaf
+      const leaf = trimmedLine;
+      currentSubBranch.leaves.push(leaf);
+    }
+  }
+
+  return result;
+}
+
+function getCardCSSVariablesObject(
+  theme: string | CardTheme,
+): Record<string, string | undefined> {
+  const cardTheme =
+    typeof theme === "string"
+      ? KNOWLEDGE_CARD_THEME[theme] ||
+        KNOWLEDGE_CARD_THEME[DEFAULT_KNOWLEDGE_CARD_THEME]
+      : theme;
+
+  return {
+    "--card-text-color": cardTheme.textColor,
+    "--card-background-class": cardTheme.backgroundClass,
+    "--card-accent-color": cardTheme.accentColor,
+    "--card-border-color": cardTheme.borderColor,
+    "--card-subtle-color": cardTheme.subtleColor,
+    "--card-decorative-line-color": cardTheme.decorativeLineColor,
+    "--card-number-color": cardTheme.numberColor,
+    "--card-background-color": cardTheme.backgroundColor,
+    "--card-background-image": cardTheme.backgroundImage,
+    "--card-title-color": cardTheme.titleColor,
+    "--card-title-font-size": cardTheme.titleFontSize,
+    "--card-title-font-weight": cardTheme.titleFontWeight,
+    "--card-title-font-family": cardTheme.titleFontFamily,
+    "--card-description-color": cardTheme.descriptionColor,
+    "--card-description-font-size": cardTheme.descriptionFontSize,
+    "--card-description-font-family": cardTheme.descriptionFontFamily,
+    "--card-section-title-color": cardTheme.sectionTitleColor,
+    "--card-section-title-font-size": cardTheme.sectionTitleFontSize,
+    "--card-section-title-font-weight": cardTheme.sectionTitleFontWeight,
+    "--card-section-title-font-family": cardTheme.sectionTitleFontFamily,
+    "--card-key-point-color": cardTheme.keyPointColor,
+    "--card-key-point-font-size": cardTheme.keyPointFontSize,
+    "--card-key-point-font-family": cardTheme.keyPointFontFamily,
+    "--card-number-background-color": cardTheme.numberBackgroundColor,
+    "--card-number-text-color": cardTheme.numberTextColor,
+    "--card-number-font-weight": cardTheme.numberFontWeight,
+    "--card-number-font-family": cardTheme.numberFontFamily,
+    "--card-decorative-line-width": cardTheme.decorativeLineWidth,
+    "--card-decorative-line-height": cardTheme.decorativeLineHeight,
+    "--card-link-color": cardTheme.linkColor,
+    "--card-font-family": cardTheme.fontFamily,
+  };
+}
+
+export function createCardStyles(
+  theme: string | CardTheme,
+): React.CSSProperties {
+  return getCardCSSVariablesObject(theme) as React.CSSProperties;
+}
+
+export function createCardCSSVariables(theme: string | CardTheme): string {
+  const cssVars = getCardCSSVariablesObject(theme);
+
+  return Object.entries(cssVars)
+    .map(([key, value]) => `${key}: ${value || ""};`)
+    .join("\n    ");
+}
+
+export async function createCardBackgroundStyles(
+  theme: CardTheme,
+): Promise<Record<string, string>> {
+  if (theme.backgroundImage) {
+    try {
+      const imagePath = `/public${theme.backgroundImage.replace(/\.webp$/, ".png")}`;
+      if (!publicCardImages[imagePath]) {
+        console.warn(`Image not found: ${imagePath}`);
+        return {};
+      }
+      const imageBase64 = await publicCardImages[imagePath]();
+      return {
+        backgroundImage: `url("${imageBase64}")`,
+        backgroundSize: "100% 100%",
+        backgroundPosition: "center",
+        position: "relative",
+        backgroundRepeat: "no-repeat",
+        backdropFilter: "blur(4px) saturate(1.2)",
+      };
+    } catch (error) {
+      console.error("Error reading background image file:", error);
+    }
+  }
+  if (theme.gradient) {
+    return {
+      backgroundImage: theme.gradient,
+      position: "relative",
+    };
+  }
+  return {
+    backgroundColor: theme.backgroundColor || "#ffffff",
+    position: "relative",
+  };
+}
+
+export function parseCardContent(jsonString?: string) {
+  const content = jsonString;
+  if (!content) return null;
+
+  const jsonMatch = content.match(/```json\n([\s\S]*?)\n```/);
+  if (jsonMatch) {
+    try {
+      return {
+        rawJson: jsonMatch[1],
+        parsedData: JSON.parse(jsonMatch[1]),
+      };
+    } catch (error) {
+      console.error("Error parsing card JSON:", error);
+      return null;
+    }
+  }
+  return null;
+}

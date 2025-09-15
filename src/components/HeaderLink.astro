@@ -1,0 +1,20 @@
+---
+type Props = {
+  href: string;
+  class?: string;
+};
+const {
+  href,
+  class:
+    className = "text-sm font-medium transition-colors text-white hover:text-emerald-400",
+} = Astro.props;
+const pathname = Astro.url.pathname.replace(import.meta.env.BASE_URL, "");
+const isActive =
+  href === pathname ||
+  href === `/${pathname.split("/")[1]}` ||
+  (href === "/blogs/tags" && pathname.startsWith("/blogs/tags"));
+---
+
+<a href={href} class={`${className || ""} ${isActive ? "active" : ""}`}>
+  <slot />
+</a>

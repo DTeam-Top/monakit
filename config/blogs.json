@@ -1,0 +1,21 @@
+{
+  "defaultConfig": {
+    "temperature": 0.1
+  },
+  "topics": {
+    "tutorial": {
+      "tags": ["ai", "tutorial"],
+      "sources": ["llms-txt/copilitkit-code.md"],
+      "contentPrompt": "./config/prompts/tutorial.txt",
+      "contentParams": {
+        "subject": "copilotkit",
+        "extra_questions": [""]
+      }
+    },
+    "summary": {
+      "tags": ["ai", "prompt engineering"],
+      "sources": ["https://www.youtube.com/watch?v=eKuFqQKYRrA"],
+      "contentPrompt": "./config/prompts/summary.txt"
+    }
+  }
+}

@@ -1,0 +1,118 @@
+---
+import ContentNavigation from "@/components/navigation/ContentNavigation.astro";
+import { SlideViewer } from "@/components/slide/slide-viewer";
+import MainLayout from "@/layouts/MainLayout.astro";
+import { getAdjacentContent } from "@/lib/navigation";
+import { formatDate } from "@/lib/utils";
+import { getCollection, getEntry } from "astro:content";
+import sitemap from "sitemap-ext:config";
+
+// add all slides to sitemap
+sitemap(async ({ addToSitemap }) => {
+  const slides = await getCollection("slides");
+
+  addToSitemap(
+    slides.map((slide) => ({
+      slug: slide.id,
+    }))
+  );
+});
+
+const { slug } = Astro.params;
+if (slug === undefined) {
+  return new Response(null, {
+    status: 400,
+    statusText: "Bad Request: Slug is missing",
+  });
+}
+
+const slide = await getEntry("slides", slug);
+
+if (!slide) {
+  return Astro.redirect("/404");
+}
+
+const origin = Astro.url.origin;
+
+// Get navigation data
+const allSlides = await getCollection("slides");
+const adjacentContent = getAdjacentContent(allSlides, slide.id);
+
+const ogImageUrl = new URL("/og-enhanced", Astro.url);
+const description = slide.data.description || "";
+let slideDescription = description;
+if (description.length > 50) {
+  let truncated = description.substring(0, 50);
+  // If the last character is punctuation, remove it
+  const punctuationRegex = /[，。！？；：""''（）【】、]/;
+  if (punctuationRegex.test(truncated.slice(-1))) {
+    truncated = truncated.slice(0, -1);
+  }
+  slideDescription = truncated + "...";
+}
+ogImageUrl.searchParams.append("type", "slide");
+ogImageUrl.searchParams.append("id", slide.id);
+ogImageUrl.searchParams.append("th", slide.data.template || "blackWhite");
+
+const coverMD = `## ${slide.data.title}\n${slide.data.author}\n\n${formatDate(slide.data.pubDate)}`;
+
+// Process images in slide content to use public paths
+function processSlideImages(content: string, slideId: string): string {
+  const imageRegex = /!\[([^\]]*)\]\((\.\/imgs\/[^)]+)\)/g;
+
+  return content.replace(imageRegex, (match, alt, relativePath) => {
+    // Convert ./imgs/filename.png to /slides/{slideId}/imgs/filename.png
+    const publicPath = `/slides/${slideId}/${relativePath.replace("./", "")}`;
+    return `![${alt}](${publicPath})`;
+  });
+}
+
+const processedSlideBody = processSlideImages(
+  slide.body!,
+  slide.id.split("/")[0]
+);
+---
+
+<MainLayout
+  title={slide.data.title}
+  description={slide.data.description}
+  type="article"
+  author={slide.data.author}
+  publishedTime={slide.data.pubDate.toISOString()}
+  modifiedTime={slide.data.updatedDate?.toISOString()}
+  section="Slides"
+  tags={slide.data.tags}
+  revealTheme={slide.data.theme || "white"}
+  keywords={slide.data.tags?.join(", ")}
+  image={ogImageUrl.toString()}
+>
+  <div class="slide-container">
+    <SlideViewer
+      client:only="react"
+      content={`${coverMD}\n---\n${processedSlideBody}`}
+      theme={slide.data.theme}
+      transition={slide.data.transition}
+      controls={slide.data.controls}
+      progress={slide.data.progress}
+    />
+  </div>
+  <div class="container mx-auto p-4">
+    <ContentNavigation adjacentContent={adjacentContent} contentType="slides" />
+  </div>
+</MainLayout>
+
+<style>
+  .slide-container {
+    width: 100%;
+    height: 80vh;
+    min-height: 600px;
+    margin: 0;
+    /* Isolate reveal.js styles to this container */
+    contain: layout style;
+  }
+
+  .slide-container :global(.reveal) {
+    width: 100% !important;
+    height: 100% !important;
+  }
+</style>

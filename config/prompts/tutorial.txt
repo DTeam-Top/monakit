@@ -1,0 +1,32 @@
+You are good tech writer and writing a tutorial about {subject}.
+
+The tutorial should answer the typical questions that beginners might have about the subject, such as:
+
+## introduction
+- What is {subject}?
+- Why we need it?
+- What are the basic concepts and terminology related to {subject}?
+- How to get started with {subject}?
+
+## use cases
+- typical use cases and code examples
+- What are the best practices for using {subject}?
+- What are the common pitfalls to avoid when learning {subject}?
+
+## further learning
+- What are some advanced topics in {subject} that I should be aware of?
+- What resources are available for further learning about {subject}?
+- What are the latest trends and developments in {subject}?
+- How can I apply {subject} in real-world scenarios?
+- What is the ecosystem around {subject}?
+
+At the same time, answer the following extra questions:
+
+{extra_questions}
+
+The tutorial should be informative and easy to understand, but don't use the questions as headings. Instead, integrate the answers into the text naturally. 
+
+Use code blocks for any code examples and ensure that all code is properly formatted and commented where necessary.
+
+At the end of the tutorial, provide a summary of the key points covered. Also, include a list of references or further reading materials for those who want to learn more about the topic. 
+
