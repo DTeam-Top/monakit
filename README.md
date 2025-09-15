@@ -1,20 +1,22 @@
 # MonaKit
 
-An Astro-powered content platform featuring AI-driven research and presentation tools.
+An Astro Template supports multiple content types:
 
-## Features
-
-- **Knowledge Cards**: AI-generated research summaries and insights
+- **Knowledge Cards**: Short summaries and insights
 - **Articles**: Blog posts and long-form content
 - **Slide Presentations**: Interactive slides with reveal.js and image processing
-- **AI Content Generation**: Automated content creation and processing using LangChain
+
+## How to Use
+
+```bash
+npm create astro@latest my-astro-project -- --template DTeam-Top/monakit
+```
 
 ## Tech Stack
 
 - Astro 5 with SSR (Vercel deployment)
 - React components with Radix UI
 - TailwindCSS for styling
-- AI integrations (Google Vertex AI, LangChain)
 - Content collections (MDX support)
 
 ## Development
@@ -25,10 +27,6 @@ npm install
 
 # Start development server
 npm run dev
-
-# Generate content
-npm run generate:blog
-npm run generate:card
 
 # Build for production
 npm run build
