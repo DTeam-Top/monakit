@@ -13,7 +13,7 @@ sitemap(async ({ addToSitemap }) => {
   addToSitemap(
     cards.map((card) => ({
       slug: card.id,
-    })),
+    }))
   );
 });
 
@@ -39,7 +39,7 @@ const currentCardTags = card.data.tags;
 // Sort cards by publication date (newest first) for navigation
 const sortedCards = allCards.sort(
   (a, b) =>
-    new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime(),
+    new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()
 );
 
 // Find current card's position and get prev/next cards
@@ -65,7 +65,7 @@ const nextCard =
 const matchingCards = allCards.filter(
   (c) =>
     c.id !== card.id &&
-    c.data.tags?.some((tag: string) => currentCardTags.includes(tag)),
+    c.data.tags?.some((tag: string) => currentCardTags.includes(tag))
 );
 
 // Pick random 4 cards
@@ -129,11 +129,16 @@ ogImageUrl.searchParams.append("th", card.data.template || "blackWhite");
 >
   <div class="container mx-auto px-4 py-8 min-h-[80vh]">
     <div class="max-w-6xl mx-auto">
-      <div class="mb-16 relative mx-auto" style="max-width:800px">
+      <div class="mb-16 relative mx-auto" style="max-width:800px;">
         <!-- Previous Card Preview -->
         {
           prevCard && (
-            <div class="md:absolute md:-left-65 md:w-80 sm:w-full mx-auto md:bottom-16 md:h-80 cursor-pointer transition-all duration-500 hover:scale-105 opacity-60 z-1 transform  sm:mb-10 md:-rotate-6">
+            <div class="xl:absolute xl:-left-65 xl:w-80 mx-auto xl:bottom-25 xl:h-80 cursor-pointer transition-all duration-500 hover:scale-105 opacity-60 z-1 transform mb-8 xl:mb-0 xl:-rotate-6">
+              <div class="text-center mb-2 opacity-100 xl:hidden block">
+                <span class="text-xs text-gray-700 bg-white/90 px-3 py-1 rounded-full inline-block min-w-[100px] backdrop-blur-sm shadow-sm">
+                  Previous Card
+                </span>
+              </div>
               <a href={`/cards/${prevCard.id}`} class="block">
                 <CardCover
                   title={prevCard.title}
@@ -144,7 +149,7 @@ ogImageUrl.searchParams.append("th", card.data.template || "blackWhite");
             </div>
           )
         }
-        <div class="relative z-10">
+        <div class="xl:relative xl:z-10">
           <KnowledgeCard
             client:only="react"
             outputValue={jsonContent}
@@ -156,7 +161,12 @@ ogImageUrl.searchParams.append("th", card.data.template || "blackWhite");
         <!-- Next Card Preview -->
         {
           nextCard && (
-            <div class="md:absolute md:-right-65 md:bottom-26 md:w-80 sm:w-full mx-auto md:h-80 cursor-pointer transition-all duration-500 hover:scale-105 opacity-60 z-1 transform  sm:mt-10 md:rotate-6">
+            <div class="xl:absolute xl:-right-65 xl:bottom-26 xl:w-80 sm:w-full mx-auto xl:h-80 cursor-pointer transition-all duration-500 hover:scale-105 opacity-60 z-1 transform mt-10 xl:mt-0 xl:rotate-6">
+              <div class="text-center mb-2 opacity-100  xl:hidden block">
+                <span class="text-xs text-gray-700 bg-white/90 px-3 py-1 rounded-full inline-block min-w-[100px] backdrop-blur-sm shadow-sm">
+                  Next Card
+                </span>
+              </div>
               <a href={`/cards/${nextCard.id}`} class="block">
                 <CardCover
                   title={nextCard.title}

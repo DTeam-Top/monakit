@@ -1,8 +1,8 @@
-import { type CardTheme, KNOWLEDGE_CARD_THEME } from "@/consts";
-import { DEFAULT_KNOWLEDGE_CARD_THEME } from "@/themes/knowledge-card-themes";
 import { type ClassValue, clsx } from "clsx";
 import type React from "react";
 import { twMerge } from "tailwind-merge";
+import { type CardTheme, KNOWLEDGE_CARD_THEME } from "@/consts";
+import { DEFAULT_KNOWLEDGE_CARD_THEME } from "@/themes/knowledge-card-themes";
 
 const publicCardImages = import.meta.glob<string>("/public/cards/*.png", {
   query: "?inline",
@@ -56,8 +56,6 @@ export function parseEndDate(dateString: string | null): Date | undefined {
   return date;
 }
 
-
-
 export async function loadPako(mermaidMarkdown: string) {
   try {
     const { deflate } = await import("pako");
@@ -79,7 +77,26 @@ export async function loadPako(mermaidMarkdown: string) {
   }
 }
 
+function cleanText(text: string): string {
+  const lines: string[] = [];
+  for (const lineRaw of text.split("\n")) {
+    let line = lineRaw;
+    if (line.includes("root((")) {
+      const pattern = /(\(\([^()]*?)\s+\([^()]*?\)(.*?\)\))/;
+      line = line.replace(pattern, (_match, p1, p2) => `${p1}${p2}`);
+    } else {
+      const pattern = /\s*\([^()]*?\)\s*(?=:|\w|\s)/g;
+      line = line.replace(pattern, "");
+    }
+    lines.push(line);
+  }
 
+  let mmMarkdown = lines.join("\n");
+  if (!mmMarkdown.startsWith("mindmap")) {
+    mmMarkdown = `mindmap\n${mmMarkdown}`;
+  }
+  return mmMarkdown;
+}
 
 export function parseMindmapToJson(text: string): {
   root: string;

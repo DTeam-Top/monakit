@@ -39,7 +39,7 @@ const CardContainer = forwardRef<HTMLDivElement, CardContainerProps>(
           transform,
         }}
       >
-        <CardContent className="pt-8 px-8 pb-4 relative z-10 flex flex-col">
+        <CardContent className="md:pt-8 pt-4 md:px-8 md:pb-4 relative z-10 flex flex-col h-auto">
           <div className="flex">
             <div className="mr-6 flex-shrink-0">
               <div className="card-decorative-line" />
@@ -59,7 +59,7 @@ const CardContainer = forwardRef<HTMLDivElement, CardContainerProps>(
             </div>
           </div>
 
-          {children}
+          <div className="flex-1 min-h-0">{children}</div>
 
           <div className="border-t border-gray-200/20 pt-4 mt-4 flex-shrink-0 overflow-hidden">
             <div className="flex">

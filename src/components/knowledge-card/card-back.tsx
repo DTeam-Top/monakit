@@ -18,7 +18,7 @@ const CardBack = memo(
           transform="rotateY(-180deg)"
           className="card-back"
         >
-          <div className="mb-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+          <div className="mb-4">
             {pakoContent && (
               <div className="px-4">
                 <StructureDisplay structureText={pakoContent.structureText} />

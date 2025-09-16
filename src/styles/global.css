@@ -452,3 +452,43 @@ pre.mermaid {
 .active {
   color: hsl(var(--primary)) !important;
 }
+
+/* Reveal viewport responsive styles */
+@media (max-width: 600px) {
+  .reveal-viewport h2 {
+    font-size: 1.5em !important;
+  }
+
+  .reveal-viewport p,
+  .reveal-viewport li {
+    font-size: 30px !important;
+  }
+}
+
+@media (max-width: 485px) {
+  .reveal-viewport h2 {
+    font-size: 1em !important;
+  }
+
+  .reveal-viewport p,
+  .reveal-viewport li {
+    font-size: 20px !important;
+  }
+}
+
+/* Reveal viewport code wrapping styles */
+.reveal-viewport pre code {
+  white-space: pre-wrap !important;
+  word-wrap: break-word !important;
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+}
+
+.reveal-viewport code span {
+  white-space: pre-wrap !important;
+  word-wrap: break-word !important;
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+  display: inline-block !important;
+  max-width: 100% !important;
+}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Branch } from "@/components/knowledge-card/structure-display";
 import { loadPako } from "@/lib/utils";
 
@@ -18,30 +18,44 @@ export const useMermaidLoader = (
   const [pakoContent, setPakoContent] = useState<PakoContent | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasMounted, setHasMounted] = useState(false);
+  const loadedMarkdownRef = useRef<string | null>(null);
 
   useEffect(() => {
-    const loadMermaidImage = async () => {
-      if (!mermaidMarkdown || (!shouldPreload && !pakoContent)) {
-        return;
-      }
+    setHasMounted(true);
+  }, []);
 
+  useEffect(() => {
+    if (!hasMounted || !mermaidMarkdown) return;
+
+    if (loadedMarkdownRef.current === mermaidMarkdown) {
+      return;
+    }
+
+    if (!shouldPreload && pakoContent && loadedMarkdownRef.current) {
+      return;
+    }
+
+    const loadMermaidImage = async () => {
       setIsLoading(true);
       setError(null);
 
       try {
         const result = await loadPako(mermaidMarkdown);
         setPakoContent(result || null);
+        loadedMarkdownRef.current = mermaidMarkdown;
       } catch (err) {
         console.error("Failed to load mermaid image:", err);
         setError("Failed to load mermaid diagram");
         setPakoContent(null);
+        loadedMarkdownRef.current = null;
       } finally {
         setIsLoading(false);
       }
     };
 
     loadMermaidImage();
-  }, [mermaidMarkdown, shouldPreload, pakoContent]);
+  }, [hasMounted, mermaidMarkdown, shouldPreload]);
 
   return {
     pakoContent,

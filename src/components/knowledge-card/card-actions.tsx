@@ -17,7 +17,7 @@ const CardActions: React.FC<CardActionsProps> = memo(
     onCopyBack,
   }) => {
     return (
-      <div className="absolute -top-0 right-1 md:top-26 md:right-[-80px] md:-translate-y-1/2 flex flex-row md:flex-col space-x-2 md:space-x-0 md:space-y-3 z-30">
+      <div className="absolute -top-3 right-1 md:top-26 md:right-[-80px] md:-translate-y-1/2 flex flex-row md:flex-col space-x-2 md:space-x-0 md:space-y-3 z-30">
         {!isFlipped && (
           <button
             type="button"

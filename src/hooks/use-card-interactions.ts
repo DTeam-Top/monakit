@@ -44,33 +44,36 @@ export const useCardInteractions = (
   };
 
   // Copy handlers
-  const handleCopyFront = async () => {
+  const copyToClipboard = async (content: string, successMessage: string) => {
     try {
-      let contentToCopy = outputValue;
-
-      if (articleData?.mermaidMarkdown) {
-        const { ...dataWithoutMermaid } = articleData;
-        const jsonString = JSON.stringify(dataWithoutMermaid, null, 2);
-        contentToCopy = `\`\`\`json\n${jsonString}\n\`\`\``;
+      if (typeof navigator === "undefined" || !navigator.clipboard) {
+        toast("Copy not supported in this environment");
+        return;
       }
 
-      await navigator.clipboard.writeText(contentToCopy);
-      toast("Content copied to clipboard");
+      await navigator.clipboard.writeText(content);
+      toast(successMessage);
     } catch (err) {
       console.error("Failed to copy to clipboard:", err);
       toast("Failed to copy, please try again");
     }
   };
 
-  const handleCopyBack = async () => {
-    try {
-      const contentToCopy = articleData?.mermaidMarkdown || "";
-      await navigator.clipboard.writeText(contentToCopy);
-      toast("Mermaid content copied to clipboard");
-    } catch (err) {
-      console.error("Failed to copy to clipboard:", err);
-      toast("Failed to copy, please try again");
+  const handleCopyFront = async () => {
+    let contentToCopy = outputValue;
+
+    if (articleData?.mermaidMarkdown) {
+      const { ...dataWithoutMermaid } = articleData;
+      const jsonString = JSON.stringify(dataWithoutMermaid, null, 2);
+      contentToCopy = `\`\`\`json\n${jsonString}\n\`\`\``;
     }
+
+    await copyToClipboard(contentToCopy, "Content copied to clipboard");
+  };
+
+  const handleCopyBack = async () => {
+    const contentToCopy = articleData?.mermaidMarkdown || "";
+    await copyToClipboard(contentToCopy, "Mermaid content copied to clipboard");
   };
 
   return {
