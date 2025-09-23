@@ -1,5 +1,4 @@
-import type React from "react";
-import type { Branch } from "./structure-display";
+import type { Branch } from "./StructureDisplay.astro";
 
 export interface ArticleData {
   title: string;
@@ -27,62 +26,7 @@ export interface PakoContent {
 }
 
 export interface CardTheme {
-  backgroundClass: string;
-}
-
-export interface KnowledgeCardProps {
-  outputValue: string;
-  url?: string;
-  isLoading: boolean;
-  theme?: string;
-  tags?: string[];
-}
-
-export interface CardActionsProps {
-  isFlipped: boolean;
-  articleData: ArticleData;
-  pakoContent: PakoContent | null;
-  url?: string;
-  onShowLinks: () => void;
-  onCopyFront: () => void;
-  onCopyBack: () => void;
-}
-
-export interface CardFrontProps {
-  articleData: ArticleData;
-  url?: string;
-  cardStyles: React.CSSProperties;
-  cardTheme: CardTheme;
-  tags?: string[];
-}
-
-export interface CardBackProps {
-  articleData: ArticleData;
-  pakoContent: PakoContent | null;
-  url?: string;
-  cardStyles: React.CSSProperties;
-  cardTheme: CardTheme;
-  tags?: string[];
-}
-
-export interface CardLinkProps {
-  title: string;
-  url: string | null;
-}
-
-export interface CardSourceProps {
-  title: string;
-  url: string | null;
-  alignment?: "left" | "right";
-  className?: string;
-}
-
-export interface LinksModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  cardStyles: React.CSSProperties;
-  references?: { title: string; url: string | null }[];
-  tools?: { title: string; url: string | null }[];
+  backgroundClass?: string;
 }
 
 export const isValidUrl = (url: string | null): boolean => {

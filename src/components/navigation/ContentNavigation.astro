@@ -29,62 +29,66 @@ if (!previous && !next) {
   aria-label="Content Navigation"
 >
   <div class="flex justify-between items-stretch pt-8 gap-4">
-    {previous ? (
-      <a
-        href={`/${contentType}/${previous.id}`}
-        class="block !no-underline flex-1 max-w-sm"
-      >
-        <div class="flex items-start justify-start px-4 py-3 text-sm font-medium border rounded-md transition-colors border-slate-400 text-slate-400 hover:text-emerald-400 hover:border-emerald-400 h-full">
-          <svg
-            class="w-5 h-5 mr-2 flex-shrink-0 mt-0.5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M15 19l-7-7 7-7"
-            ></path>
-          </svg>
-          <div class="min-w-0">
-            <div class="text-xs opacity-70">Previous</div>
-            <div class="font-medium break-words">{previous.title}</div>
+    {
+      previous ? (
+        <a
+          href={`/${contentType}/${previous.id}`}
+          class="block !no-underline flex-1 max-w-sm"
+        >
+          <div class="flex items-start justify-start px-4 py-3 text-sm font-medium border rounded-md transition-colors border-slate-400 text-slate-400 hover:text-emerald-400 hover:border-emerald-400 h-full">
+            <svg
+              class="w-5 h-5 mr-2 flex-shrink-0 mt-0.5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+            <div class="min-w-0">
+              <div class="text-xs opacity-70">Previous</div>
+              <div class="font-medium break-words">{previous.title}</div>
+            </div>
           </div>
-        </div>
-      </a>
-    ) : (
-      <div class="flex-1 max-w-sm"></div>
-    )}
+        </a>
+      ) : (
+        <div class="flex-1 max-w-sm" />
+      )
+    }
 
-    {next ? (
-      <a
-        href={`/${contentType}/${next.id}`}
-        class="block text-right !no-underline flex-1 max-w-sm"
-      >
-        <div class="flex items-start justify-end px-4 py-3 text-sm font-medium border rounded-md transition-colors border-slate-400 text-slate-400 hover:text-emerald-400 hover:border-emerald-400 h-full">
-          <div class="min-w-0">
-            <div class="text-xs opacity-70">Next</div>
-            <div class="font-medium break-words">{next.title}</div>
+    {
+      next ? (
+        <a
+          href={`/${contentType}/${next.id}`}
+          class="block text-right !no-underline flex-1 max-w-sm"
+        >
+          <div class="flex items-start justify-end px-4 py-3 text-sm font-medium border rounded-md transition-colors border-slate-400 text-slate-400 hover:text-emerald-400 hover:border-emerald-400 h-full">
+            <div class="min-w-0">
+              <div class="text-xs opacity-70">Next</div>
+              <div class="font-medium break-words">{next.title}</div>
+            </div>
+            <svg
+              class="w-5 h-5 ml-2 flex-shrink-0 mt-0.5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
           </div>
-          <svg
-            class="w-5 h-5 ml-2 flex-shrink-0 mt-0.5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 5l7 7-7 7"
-            ></path>
-          </svg>
-        </div>
-      </a>
-    ) : (
-      <div class="flex-1 max-w-sm"></div>
-    )}
+        </a>
+      ) : (
+        <div class="flex-1 max-w-sm" />
+      )
+    }
   </div>
 </nav>

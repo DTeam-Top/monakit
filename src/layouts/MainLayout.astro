@@ -1,8 +1,11 @@
 ---
 import { cn } from "@/lib/utils";
+import type { SlideMetadata } from "@/schemas/slide";
+import { z } from "astro:content";
 import BaseHead from "../components/BaseHead.astro";
 import Footer from "../components/Footer.astro";
 import Header from "../components/Header.astro";
+import { Toaster } from "../components/ui/sonner";
 
 import "../styles/global.css";
 
@@ -19,19 +22,7 @@ interface Props {
   modifiedTime?: string;
   section?: string;
   tags?: string[];
-  revealTheme?:
-    | "black"
-    | "white"
-    | "league"
-    | "beige"
-    | "drdracula"
-    | "sky"
-    | "night"
-    | "serif"
-    | "simple"
-    | "solarized"
-    | "blood"
-    | "moon";
+  revealTheme?: z.infer<typeof SlideMetadata>["theme"];
 }
 
 const {
@@ -86,7 +77,8 @@ const {
       </main>
       <Footer />
     </div>
-    <script type="module">
+    <Toaster client:load />
+    <script is:inline type="module">
       import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
       mermaid.initialize({ startOnLoad: true });
     </script>

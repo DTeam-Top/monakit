@@ -86,7 +86,7 @@ const websiteStructuredData =
             "@type": "EntryPoint",
             urlTemplate: new URL(
               "/blogs?search={search_term_string}",
-              Astro.site,
+              Astro.site
             ).toString(),
           },
           "query-input": "required name=search_term_string",
@@ -142,7 +142,6 @@ const productStructuredData =
   href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200..900&display=swap"
   rel="stylesheet"
   media="print"
-  onload="this.media='all'"
 />
 <noscript>
   <link
@@ -215,6 +214,7 @@ const productStructuredData =
   articleStructuredData && (
     <script
       type="application/ld+json"
+      is:inline
       set:html={JSON.stringify(articleStructuredData)}
     />
   )
@@ -224,6 +224,7 @@ const productStructuredData =
   websiteStructuredData && (
     <script
       type="application/ld+json"
+      is:inline
       set:html={JSON.stringify(websiteStructuredData)}
     />
   )
@@ -233,6 +234,7 @@ const productStructuredData =
   productStructuredData && (
     <script
       type="application/ld+json"
+      is:inline
       set:html={JSON.stringify(productStructuredData)}
     />
   )

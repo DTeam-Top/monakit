@@ -33,7 +33,7 @@ const images = import.meta.glob<{ default: ImageMetadata }>(
 
 if (!images[fullPath]) {
   throw new Error(
-    `"${fullPath}" 图片不存在. 请检查路径是否正确: "/src/assets/{,**/*}.{jpeg,jpg,png,gif,webp}"`
+    `"${fullPath}" image does not exist. Please check the path: "/src/assets/{,**/*}.{jpeg,jpg,png,gif,webp}"`
   );
 }
 ---
@@ -48,7 +48,7 @@ if (!images[fullPath]) {
     title={title}
     class:list={[
       className,
-      "w-full h-full object-contain [image-rendering:-webkit-optimize-contrast] [image-rendering:crisp-edges] [transform:translateZ(0)] [backface-visibility:hidden]",
+      "w-full h-full object-contain [image-rendering:-webkit-optimize-contrast] [transform:translateZ(0)] [backface-visibility:hidden]",
     ]}
     width={width}
     height={height}

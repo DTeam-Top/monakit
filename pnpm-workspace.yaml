@@ -1,13 +1,4 @@
-packages:
-  - '.'
-ignoredBuiltDependencies:
-  - '@scarf/scarf'
 onlyBuiltDependencies:
-  - '@biomejs/biome'
-  - '@scarf/scarf'
   - '@tailwindcss/oxide'
   - esbuild
-  - protobufjs
-  - puppeteer
   - sharp
-  - vue-demi

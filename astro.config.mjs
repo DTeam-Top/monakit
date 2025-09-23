@@ -6,7 +6,6 @@ import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import { analyzer } from "vite-bundle-analyzer";
-import { slideImagesPlugin } from "./config/vite-plugin-slide-images";
 import { env } from "./src/env";
 
 export default defineConfig({
@@ -35,8 +34,6 @@ export default defineConfig({
     }),
     react({
       include: [
-        "**/components/knowledge-card/*",
-        "**/components/share-menu.tsx",
         "**/components/image-viewer.tsx",
         "**/components/slide/slide-viewer.tsx",
       ],
@@ -45,7 +42,6 @@ export default defineConfig({
   vite: {
     plugins: [
       tailwindcss(),
-      slideImagesPlugin(),
       process.env.ANALYZE &&
         analyzer({
           analyzerMode: "static",

@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "astro:content";
 
 // Pagination types
 export const PaginationParams = z.object({

@@ -1,8 +1,7 @@
 ---
-import { getEntry, render } from "astro:content";
-import { getCollection } from "astro:content";
-import BlogPost from '../../layouts/BlogPost.astro';
-import sitemap from 'sitemap-ext:config';
+import { getCollection, getEntry, render } from "astro:content";
+import sitemap from "sitemap-ext:config";
+import BlogPost from "../../layouts/BlogPost.astro";
 
 // add all blog posts to sitemap
 sitemap(async ({ addToSitemap }) => {
@@ -17,18 +16,21 @@ sitemap(async ({ addToSitemap }) => {
 
 const { slug } = Astro.params;
 if (slug === undefined) {
-  return new Response(null, { status: 400, statusText: 'Bad Request: Slug is missing' });
+  return new Response(null, {
+    status: 400,
+    statusText: "Bad Request: Slug is missing",
+  });
 }
 
 const post = await getEntry("blogs", slug);
 
 if (!post) {
-  return Astro.redirect("/404"); 
+  return Astro.redirect("/404");
 }
 
 const { Content } = await render(post);
 ---
 
 <BlogPost {...post.data} id={post.id}>
-    <Content />
+  <Content />
 </BlogPost>

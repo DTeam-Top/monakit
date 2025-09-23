@@ -8,7 +8,7 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "@/consts";
 import MainLayout from "@/layouts/MainLayout.astro";
 import { getCollection } from "astro:content";
 
-const posts = (await getCollection("blogs"))
+const allPosts = (await getCollection("blogs"))
   .map((post) => ({
     id: post.id,
     title: post.data.title,
@@ -19,19 +19,18 @@ const posts = (await getCollection("blogs"))
     author: post.data.author,
     metadata: post.data.metadata,
   }))
-  .sort((a, b) => b.pubDate.valueOf() - a.pubDate.valueOf())
-  .slice(0, 3);
+  .sort((a, b) => b.pubDate.valueOf() - a.pubDate.valueOf());
 
-const cards = (await getCollection("cards"))
+const allCards = (await getCollection("cards"))
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
   .map((card) => ({
     id: card.id,
     title: card.data.title,
     template: card.data.template,
-  }))
-  .slice(0, 9);
+    tags: card.data.tags,
+  }));
 
-const slides = (await getCollection("slides"))
+const allSlides = (await getCollection("slides"))
   .filter((slide) => slide.data.pubDate) // Filter out slides without pubDate
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
   .map((slide) => ({
@@ -42,59 +41,72 @@ const slides = (await getCollection("slides"))
     transition: slide.data.transition,
     theme: slide.data.theme,
     pubDate: slide.data.pubDate,
-  }))
-  .slice(0, 6);
+    tags: slide.data.tags,
+  }));
+
+const allTags = [
+  ...allPosts.flatMap((post) => post.tags || []),
+  ...allCards.flatMap((card) => card.tags || []),
+  ...allSlides.flatMap((slide) => slide.tags || []),
+];
+const uniqueTags = [...new Set(allTags)];
+
+const posts = allPosts.slice(0, 3);
+const cards = allCards.slice(0, 9);
+const slides = allSlides.slice(0, 6);
 ---
 
 <MainLayout
-  title={SITE_TITLE}
+  title={`Home | ${SITE_TITLE}`}
   description={SITE_DESCRIPTION}
-  className="w-full"
+  className="w-full p-0"
 >
-  <HeroSection />
+  <HeroSection uniqueTags={uniqueTags} />
 
-  <LatestSection
-    title="Articles"
-    accentColor="emerald"
-    description="Fresh insights and lessons from our recent explorations."
-    viewAllHref="/blogs"
-    viewAllText="View All Articles"
-    viewAllButtonWidth="165px"
-  >
-    {posts.map((blog) => <BlogCard blog={blog} />)}
-  </LatestSection>
+  <div class="px-4 md:px-6">
+    <LatestSection
+      title="Articles"
+      accentColor="emerald"
+      description="Fresh insights and lessons from our recent explorations."
+      viewAllHref="/blogs"
+      viewAllText="View All Articles"
+      viewAllButtonWidth="165px"
+    >
+      {posts.map((blog) => <BlogCard blog={blog} />)}
+    </LatestSection>
 
-  <LatestSection
-    title="Cards"
-    accentColor="emerald"
-    description="Check out our quick notes and summaries"
-    viewAllHref="/cards"
-    viewAllText="View All Cards"
-    viewAllButtonWidth="154px"
-  >
-    {
-      cards.map((card) => (
-        <a href={`/cards/${card.id}`}>
-          <CardCover title={card.title} template={card.template} />
-        </a>
-      ))
-    }
-  </LatestSection>
+    <LatestSection
+      title="Cards"
+      accentColor="emerald"
+      description="Check out our quick notes and summaries"
+      viewAllHref="/cards"
+      viewAllText="View All Cards"
+      viewAllButtonWidth="154px"
+    >
+      {
+        cards.map((card) => (
+          <a href={`/cards/${card.id}`}>
+            <CardCover title={card.title} template={card.template} />
+          </a>
+        ))
+      }
+    </LatestSection>
 
-  <LatestSection
-    title="Slides"
-    accentColor="purple"
-    description="Interactive presentations crafted for developers."
-    viewAllHref="/slides"
-    viewAllText="View All Slides"
-    viewAllButtonWidth="155px"
-  >
-    {
-      slides.map((slide) => (
-        <a href={`/slides/${slide.id}`}>
-          <SlideCard slide={slide} />
-        </a>
-      ))
-    }
-  </LatestSection>
+    <LatestSection
+      title="Slides"
+      accentColor="purple"
+      description="Interactive presentations crafted for developers."
+      viewAllHref="/slides"
+      viewAllText="View All Slides"
+      viewAllButtonWidth="155px"
+    >
+      {
+        slides.map((slide) => (
+          <a href={`/slides/${slide.id}`}>
+            <SlideCard slide={slide} />
+          </a>
+        ))
+      }
+    </LatestSection>
+  </div>
 </MainLayout>

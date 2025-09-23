@@ -27,7 +27,7 @@ export const SlideViewer: React.FC<SlideViewerProps> = ({
   preview = false,
 }) => {
   const deckRef = useRef<HTMLDivElement>(null);
-  const revealRef = useRef<any>(null);
+  const revealRef = useRef<Reveal.Api>(null);
   const [isClient, setIsClient] = useState(false);
   const [themeLoaded, setThemeLoaded] = useState(false);
   const [stylesInjected, setStylesInjected] = useState(false);
@@ -126,20 +126,14 @@ export const SlideViewer: React.FC<SlideViewerProps> = ({
           "reveal.js/plugin/notes/notes.esm.js"
         );
 
-        // Parse markdown content into slides
-        const slides = content
-          .split(/^---$/gm)
-          .map((slide) => slide.trim())
-          .filter((slide) => slide.length > 0);
-
         // Create HTML structure for reveal.js
         const backgroundAttrs = preview ? getThemeBackgroundAttrs(theme) : "";
-        const slidesHtml = slides
-          .map(
-            (slide) =>
-              `<section data-markdown ${backgroundAttrs}><script type="text/template">${slide}</script></section>`,
-          )
-          .join("");
+        const slidesHtml = `\
+          <section data-markdown ${backgroundAttrs}>
+            <script type="text/template">
+              ${content}
+            </script>
+          </section>`;
 
         // Set the HTML content
         if (deckRef.current && !revealRef.current) {
@@ -152,7 +146,13 @@ export const SlideViewer: React.FC<SlideViewerProps> = ({
             hash: false,
             controls,
             progress,
-            transition: transition as any,
+            transition: transition as
+              | "none"
+              | "fade"
+              | "slide"
+              | "convex"
+              | "concave"
+              | "zoom",
             plugins: [RevealMarkdown, Highlight, Notes],
             markdown: { smartypants: true },
             embedded: true,

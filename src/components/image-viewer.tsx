@@ -1,7 +1,7 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
-import { useEffect, useReducer, useRef } from "react";
+import { useCallback, useEffect, useReducer, useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -11,6 +11,7 @@ import {
 
 interface ImageViewerProps {
   selector?: string;
+  observe?: string | string[];
 }
 
 type ViewerAction =
@@ -52,7 +53,7 @@ function viewerReducer(state: ViewerState, action: ViewerAction): ViewerState {
       return {
         ...state,
         isLoading: false,
-        error: action.error || "图片加载失败",
+        error: action.error || "Could not load image",
       };
     default:
       return state;
@@ -66,6 +67,7 @@ const imageEventHandlers = new WeakMap<
 
 export const ImageViewer: React.FC<ImageViewerProps> = ({
   selector = "article img",
+  observe,
 }) => {
   const [state, dispatch] = useReducer(viewerReducer, {
     image: null,
@@ -76,12 +78,13 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
   });
 
   const dispatchRef = useRef(dispatch);
+  const refreshFrameRef = useRef<number | null>(null);
 
   useEffect(() => {
     dispatchRef.current = dispatch;
   });
 
-  useEffect(() => {
+  const detachListeners = useCallback(() => {
     for (const img of document.querySelectorAll(selector)) {
       if (!(img instanceof HTMLImageElement)) continue;
 
@@ -94,6 +97,10 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
         imageEventHandlers.delete(img);
       }
     }
+  }, [selector]);
+
+  const attachListeners = useCallback(() => {
+    detachListeners();
 
     for (const img of document.querySelectorAll(selector)) {
       if (!(img instanceof HTMLImageElement)) continue;
@@ -131,22 +138,70 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
         click: handleClick,
       });
     }
+  }, [detachListeners, selector]);
+
+  useEffect(() => {
+    attachListeners();
 
     return () => {
-      for (const img of document.querySelectorAll(selector)) {
-        if (!(img instanceof HTMLImageElement)) continue;
+      if (refreshFrameRef.current !== null) {
+        cancelAnimationFrame(refreshFrameRef.current);
+        refreshFrameRef.current = null;
+      }
 
-        const handlers = imageEventHandlers.get(img);
-        if (handlers) {
-          img.removeEventListener("mouseenter", handlers.enter);
-          img.removeEventListener("mouseleave", handlers.leave);
-          img.removeEventListener("click", handlers.click);
-          img.style.cursor = "";
-          imageEventHandlers.delete(img);
+      detachListeners();
+    };
+  }, [attachListeners, detachListeners]);
+
+  useEffect(() => {
+    if (!observe) return;
+
+    const selectors = Array.isArray(observe) ? observe : [observe];
+    const targets = selectors.flatMap((sel) =>
+      Array.from(document.querySelectorAll(sel)).filter(
+        (node): node is Element => node instanceof Element,
+      ),
+    );
+
+    if (targets.length === 0) {
+      return;
+    }
+
+    const queueRefresh = () => {
+      if (refreshFrameRef.current !== null) return;
+      refreshFrameRef.current = requestAnimationFrame(() => {
+        refreshFrameRef.current = null;
+        attachListeners();
+      });
+    };
+
+    const observers = targets.map((target) => {
+      const observer = new MutationObserver((mutations) => {
+        if (
+          mutations.some(
+            (mutation) =>
+              mutation.addedNodes.length > 0 ||
+              mutation.removedNodes.length > 0,
+          )
+        ) {
+          queueRefresh();
         }
+      });
+
+      observer.observe(target, {
+        childList: true,
+        subtree: true,
+      });
+
+      return observer;
+    });
+
+    return () => {
+      for (const observer of observers) {
+        observer.disconnect();
       }
     };
-  }, [selector]);
+  }, [observe, attachListeners]);
 
   const handleDialogChange = (open: boolean) => {
     if (!open) dispatch({ type: "CLOSE_IMAGE" });
@@ -173,7 +228,7 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
     const img = e.currentTarget;
     dispatch({
       type: "IMAGE_ERROR",
-      error: `无法加载图片: ${img.src}`,
+      error: `Failed to load image: ${img.src}`,
     });
   };
 
@@ -185,27 +240,49 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
             hideCloseButton
             className="cursor-pointer p-0 overflow-hidden bg-black/0 border-0 shadow-none sm:max-w-[95vw] sm:rounded-lg"
           >
-            <DialogTitle className="sr-only hidden">图片查看器</DialogTitle>
+            <DialogTitle className="sr-only hidden">Image Viewer</DialogTitle>
             <DialogDescription className="sr-only hidden">
-              放大查看文章中的图片
+              View the image in full size
             </DialogDescription>
-            <div
-              className="relative w-full h-full flex justify-center items-center"
-              onClick={handleImageClick}
-              onKeyDown={handleKeyDown}
-            >
-              {state.isLoading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                  <Loader2 className="h-8 w-8 animate-spin text-white" />
-                </div>
-              )}
+            <div className="relative w-full h-full flex justify-center items-center">
+              <button
+                type="button"
+                className="relative w-full h-full flex justify-center items-center cursor-pointer bg-transparent border-0 p-0"
+                onClick={handleImageClick}
+                onKeyDown={handleKeyDown}
+                aria-label="Close"
+              >
+                {state.isLoading && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                    <Loader2 className="h-8 w-8 animate-spin text-white" />
+                  </div>
+                )}
 
-              {state.error ? (
-                <div className="flex flex-col items-center justify-center p-6 text-center bg-black/10 rounded-lg">
+                {state.error ? (
+                  <div
+                    className="max-h-[90vh] max-w-[90vw]"
+                    aria-hidden="true"
+                  />
+                ) : (
+                  <div className="max-h-[90vh] max-w-[90vw] cursor-pointer">
+                    <img
+                      src={state.image}
+                      alt={state.alt}
+                      className="object-contain"
+                      onLoad={handleImageLoad}
+                      onError={handleImageError}
+                      aria-label="Close"
+                    />
+                  </div>
+                )}
+              </button>
+
+              {state.error && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-black/10 rounded-lg pointer-events-none">
                   <span className="text-red-500 mb-2">⚠️ {state.error}</span>
                   <button
                     type="button"
-                    className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 text-sm mt-2"
+                    className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 text-sm mt-2 pointer-events-auto"
                     onClick={(e) => {
                       e.stopPropagation();
                       if (state.image) {
@@ -216,22 +293,10 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
                         });
                       }
                     }}
-                  >
-                    重试加载
-                  </button>
-                </div>
-              ) : (
-                <div className="max-h-[90vh] max-w-[90vw] cursor-pointer">
-                  <img
-                    src={state.image}
-                    alt={state.alt}
-                    className="object-contain "
-                    onClick={handleImageClick}
-                    onLoad={handleImageLoad}
-                    onError={handleImageError}
                     onKeyDown={handleKeyDown}
-                    aria-label="关闭图片查看器"
-                  />
+                  >
+                    Retry
+                  </button>
                 </div>
               )}
             </div>

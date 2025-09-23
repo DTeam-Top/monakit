@@ -1,6 +1,7 @@
 ---
 import BetaBadge from "@/components/BetaBadge.astro";
 import CustomImage from "@/components/CustomImage.astro";
+import { Search } from "lucide-react";
 import { getNavigationItems, SITE_TITLE } from "../consts";
 import HeaderLink from "./HeaderLink.astro";
 
@@ -11,7 +12,7 @@ const visibleMenuItems = getNavigationItems();
   class="sticky top-0 z-50 w-full border-b border-teahouse-primary/10 bg-teahouse-bg/95 backdrop-blur supports-[backdrop-filter]:bg-teahouse-bg/60"
 >
   <div class="container flex h-16 items-center justify-between">
-    <div class="flex items-center gap-6 md:gap-10">
+    <div class="flex items-center gap-6 md:gap-8">
       <a href="/" class="flex items-center space-x-2 md:ml-0 ml-4">
         <CustomImage
           src="/logo.webp"
@@ -33,7 +34,7 @@ const visibleMenuItems = getNavigationItems();
       </a>
     </div>
 
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-4">
       <button
         id="mobile-menu-button"
         class="md:hidden inline-flex items-center justify-center p-2 rounded-md text-slate-300 hover:text-emerald-400 hover:bg-teahouse-primary/10 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-teahouse-primary"
@@ -70,13 +71,22 @@ const visibleMenuItems = getNavigationItems();
             d="M6 18L18 6M6 6l12 12"></path>
         </svg>
       </button>
-      <nav class="hidden gap-6 md:flex justify-center">
+      <nav class="hidden gap-8 md:flex items-center">
         {
           visibleMenuItems.map((item) => (
             <HeaderLink href={item.href}>{item.label}</HeaderLink>
           ))
         }
       </nav>
+    </div>
+    <div class="hidden md:block">
+      <a
+        href="/search"
+        class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium hover:text-emerald-600 transition-colors text-white"
+      >
+        <Search className="w-4 h-4" />
+        Search
+      </a>
     </div>
   </div>
 
@@ -94,6 +104,15 @@ const visibleMenuItems = getNavigationItems();
           </a>
         ))
       }
+      <div class="px-3 py-2">
+        <a
+          href="/search"
+          class="flex items-center gap-2 py-2 rounded-md text-base font-medium text-white hover:text-emerald-400"
+        >
+          <Search className="w-4 h-4" />
+          Search
+        </a>
+      </div>
     </div>
   </div>
 </header>

@@ -1,6 +1,6 @@
 ---
 import { Image } from "astro:assets";
-import { ShareMenu } from "../share-menu";
+import ShareButtons from "../ShareButtons.astro";
 
 export interface Blog {
   id: string;
@@ -18,7 +18,11 @@ interface Props {
   blog: Blog;
 }
 
+const origin = Astro.url.origin;
+
 const { blog } = Astro.props;
+
+const url = `${origin}/blogs/${blog.id}`;
 
 function getCategoryColor(blogId: string) {
   const gradients = [
@@ -51,7 +55,7 @@ const formatDate = (date: Date | string) => {
 ---
 
 <div
-  class="relative overflow-hidden bg-slate-900/50 border border-slate-700 hover:border-slate-600 pt-0 gap-0 w-full flex flex-col cursor-pointer transition-all duration-200 hover:-translate-y-3 hover:shadow-lg hover:border-emerald-500/50 hover:shadow-lg hover:shadow-emerald-500/10 hover:-translate-y-1 rounded-lg"
+  class="relative overflow-hidden bg-slate-900/50 border border-slate-700 pt-0 gap-0 w-full flex flex-col cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:border-emerald-500/50 hover:shadow-lg hover:shadow-emerald-500/10 rounded-lg"
 >
   <a href={`/blogs/${blog.id}`} class="flex flex-col flex-grow">
     <header class="p-0 gap-0">
@@ -102,11 +106,12 @@ const formatDate = (date: Date | string) => {
     >
       Read More
     </a>
-    <ShareMenu
-      name={blog.title}
-      url={`/blogs/${blog.id}`}
-      description={blog.description}
-      client:load
-    />
+    <div class="flex justify-end items-center gap-2">
+      <ShareButtons
+        url={url}
+        title={blog.title}
+        description={blog.description}
+      />
+    </div>
   </div>
 </div>

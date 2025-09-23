@@ -1,8 +1,10 @@
 ---
-import { KNOWLEDGE_CARD_THEME } from "@/consts";
 import { createCardStyles } from "@/lib/utils";
 import "@/styles/card.css";
-import { DEFAULT_KNOWLEDGE_CARD_THEME } from "@/themes/knowledge-card-themes";
+import {
+  DEFAULT_KNOWLEDGE_CARD_THEME,
+  KNOWLEDGE_CARD_THEME,
+} from "@/themes/knowledge-card-themes";
 import type { CardCoverProps } from "./types";
 
 const { title, template, size = "medium" } = Astro.props as CardCoverProps;
@@ -17,7 +19,9 @@ const cardStyles = createCardStyles(template);
   class={`card-cover w-full h-64 shadow-lg rounded-2xl border-0 cursor-pointer ${cardTheme.backgroundClass}`}
   style={cardStyles}
 >
-  <div class={`card-cover-content relative z-10 h-full ${size === "small" ? "p-2" : "p-6"}`}>
+  <div
+    class={`card-cover-content relative z-10 h-full ${size === "small" ? "p-2" : "p-6"}`}
+  >
     <div class="card-cover-inner">
       <div class="flex items-start gap-4 w-full">
         <div class="card-cover-decorative-line"></div>

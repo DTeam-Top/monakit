@@ -1,8 +1,24 @@
 import { type ClassValue, clsx } from "clsx";
 import type React from "react";
 import { twMerge } from "tailwind-merge";
-import { type CardTheme, KNOWLEDGE_CARD_THEME } from "@/consts";
-import { DEFAULT_KNOWLEDGE_CARD_THEME } from "@/themes/knowledge-card-themes";
+import type { CardTheme } from "@/consts";
+import {
+  DEFAULT_KNOWLEDGE_CARD_THEME,
+  KNOWLEDGE_CARD_THEME,
+} from "@/themes/knowledge-card-themes";
+
+export const TEMPLATE_KEY_MAP: Record<string, string> = {
+  blackwhite: "blackWhite",
+  vintage: "vintage",
+  glassmorphism: "glassmorphism",
+  freshnature: "freshNature",
+};
+
+export function getTemplateKey(template: string | undefined): string {
+  if (!template) return "blackWhite";
+  const key = String(template).toLowerCase();
+  return TEMPLATE_KEY_MAP[key] || "blackWhite";
+}
 
 const publicCardImages = import.meta.glob<string>("/public/cards/*.png", {
   query: "?inline",
@@ -54,6 +70,151 @@ export function parseEndDate(dateString: string | null): Date | undefined {
   const date = new Date(dateString);
   date.setHours(23, 59, 59, 999);
   return date;
+}
+
+export function isVideoUrl(url: string): boolean {
+  try {
+    const urlObj = new URL(url);
+    const hostname = urlObj.hostname.toLowerCase();
+    const pathname = urlObj.pathname.toLowerCase();
+
+    const videoPatterns = [
+      {
+        hosts: ["youtube.com", "www.youtube.com", "m.youtube.com"],
+        paths: ["/watch", "/embed/", "/v/"],
+      },
+      { hosts: ["youtu.be"], paths: ["/"] },
+      { hosts: ["music.youtube.com"], paths: ["/watch"] },
+
+      {
+        hosts: ["bilibili.com", "www.bilibili.com", "m.bilibili.com"],
+        paths: ["/video/", "/bangumi/"],
+      },
+      { hosts: ["v.qq.com"], paths: ["/x/cover/", "/x/page/"] },
+      { hosts: ["youku.com", "v.youku.com"], paths: ["/v_show/"] },
+      { hosts: ["iqiyi.com", "www.iqiyi.com"], paths: ["/v_", "/a_"] },
+      { hosts: ["acfun.cn", "www.acfun.cn"], paths: ["/v/"] },
+
+      { hosts: ["vimeo.com"], paths: ["/"] },
+      { hosts: ["dailymotion.com"], paths: ["/video/"] },
+      { hosts: ["twitch.tv"], paths: ["/videos/"] },
+      { hosts: ["facebook.com", "www.facebook.com"], paths: ["/watch/"] },
+      {
+        hosts: ["instagram.com", "www.instagram.com"],
+        paths: ["/reel/", "/tv/"],
+      },
+      { hosts: ["tiktok.com", "www.tiktok.com"], paths: ["/@"] },
+
+      { hosts: ["video.weibo.com"], paths: ["/show"] },
+      { hosts: ["tv.sohu.com"], paths: ["/v/"] },
+      { hosts: ["56.com"], paths: ["/u"] },
+    ];
+
+    for (const pattern of videoPatterns) {
+      if (pattern.hosts.includes(hostname)) {
+        if (pattern.paths.length === 1 && pattern.paths[0] === "/") {
+          return true;
+        }
+
+        for (const path of pattern.paths) {
+          if (pathname.startsWith(path)) {
+            return true;
+          }
+        }
+      }
+    }
+
+    const videoExtensions = [
+      ".mp4",
+      ".avi",
+      ".mov",
+      ".wmv",
+      ".flv",
+      ".webm",
+      ".mkv",
+      ".m4v",
+      ".3gp",
+      ".ogv",
+      ".ts",
+      ".m3u8",
+    ];
+
+    for (const ext of videoExtensions) {
+      if (pathname.endsWith(ext)) {
+        return true;
+      }
+    }
+
+    const searchParams = urlObj.searchParams;
+    if (searchParams.has("v") && hostname.includes("youtube")) {
+      return true;
+    }
+
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+export async function loadSourceContent(sources: string[]) {
+  const contents = [];
+  const failedSources = [];
+
+  for (const source of sources) {
+    try {
+      try {
+        new URL(source);
+      } catch {
+        throw new Error("Invalid URL");
+      }
+
+      if (/\.(pdf|doc|docx|txt|csv|pptx|xlsx)$/i.exec(source)) {
+        throw new Error("Document URL detected");
+      }
+      if (isVideoUrl(source)) {
+        throw new Error("Video URL detected");
+      }
+      const websiteContent = await loadWebsite(source);
+      if (websiteContent.length === 0 || !websiteContent[0].pageContent) {
+        throw new Error("No content found");
+      }
+      contents.push(...websiteContent);
+    } catch (error) {
+      console.warn(`Failed to load source ${source}:`, error);
+      failedSources.push({
+        source,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+  return { contents, failedSources };
+}
+
+async function loadWebsite(uri: string) {
+  try {
+    const response = await fetch("/api/proxy/web-content", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ url: uri }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (data.error) {
+      throw new Error(data.error);
+    }
+
+    return data.docs;
+  } catch (error) {
+    console.error(`Failed to load website ${uri}:`, error);
+    throw error;
+  }
 }
 
 export async function loadPako(mermaidMarkdown: string) {
