@@ -34,10 +34,9 @@ const {
   tags = [],
 } = Astro.props;
 
-const absoluteImageUrl =
-  image && image.startsWith("http")
-    ? image
-    : new URL(image, Astro.url).toString();
+const absoluteImageUrl = image?.startsWith("http")
+  ? image
+  : new URL(image, Astro.url).toString();
 
 // Generate structured data
 const articleStructuredData =
@@ -86,7 +85,7 @@ const websiteStructuredData =
             "@type": "EntryPoint",
             urlTemplate: new URL(
               "/blogs?search={search_term_string}",
-              Astro.site
+              Astro.site,
             ).toString(),
           },
           "query-input": "required name=search_term_string",

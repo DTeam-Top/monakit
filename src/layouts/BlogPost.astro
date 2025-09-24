@@ -1,11 +1,11 @@
 ---
+import type { CollectionEntry } from "astro:content";
+import { getCollection } from "astro:content";
 import ContentNavigation from "@/components/navigation/ContentNavigation.astro";
 import ShareButtons from "@/components/ShareButtons.astro";
 import TagFilter from "@/components/TagFilter.astro";
 import { SITE_TITLE } from "@/consts";
 import { getAdjacentContent } from "@/lib/navigation";
-import type { CollectionEntry } from "astro:content";
-import { getCollection } from "astro:content";
 import FormattedDate from "../components/FormattedDate.astro";
 import { ImageViewer } from "../components/image-viewer";
 import "../styles/article.css";

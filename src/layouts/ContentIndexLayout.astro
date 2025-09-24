@@ -1,9 +1,9 @@
 ---
+import { getCollection } from "astro:content";
 import BlogsPage from "@/components/blog/BlogsPage.astro";
 import CardsPage from "@/components/knowledge-card/CardsPage.astro";
 import type { Slide } from "@/components/slide/SlideCard.astro";
 import SlidesPage from "@/components/slide/SlidesPage.astro";
-import { getCollection } from "astro:content";
 import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
 import { paginate } from "../lib/pagination";
 import MainLayout from "./MainLayout.astro";
@@ -29,7 +29,7 @@ const tagCounts = tags.reduce(
     acc[currentTag] = (acc[currentTag] || 0) + 1;
     return acc;
   },
-  {} as Record<string, number>
+  {} as Record<string, number>,
 );
 
 const tagList = Object.entries(tagCounts)
@@ -43,13 +43,13 @@ const tagList = Object.entries(tagCounts)
         4,
         Math.ceil(
           ((count as number) * 4) /
-            Math.max(...(Object.values(tagCounts) as number[]))
-        )
-      )
+            Math.max(...(Object.values(tagCounts) as number[])),
+        ),
+      ),
     ),
   }));
 
-let allItems;
+let allItems: typeof sourceItems;
 if (tag) {
   allItems = sourceItems.filter((item) => item.data.tags?.includes(tag));
 } else {
@@ -57,7 +57,7 @@ if (tag) {
 }
 
 const sortedItems = allItems.sort(
-  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
 const paginatedItems = paginate(sortedItems, page, limit);
 const pageTitle = `${title} - Page ${page} | ${SITE_TITLE}`;

@@ -1,7 +1,7 @@
 ---
-import { ASSETS_IMAGES_PREFIX } from "@/consts";
-import type { ImageMetadata } from "astro";
 import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+import { ASSETS_IMAGES_PREFIX } from "@/consts";
 
 interface Props {
   src: string;
@@ -28,12 +28,12 @@ const fullPath = src.startsWith(ASSETS_IMAGES_PREFIX)
   : ASSETS_IMAGES_PREFIX + src;
 
 const images = import.meta.glob<{ default: ImageMetadata }>(
-  "/src/assets/images/{*,**/*}.{jpeg,jpg,png,gif,webp}"
+  "/src/assets/images/{*,**/*}.{jpeg,jpg,png,gif,webp}",
 );
 
 if (!images[fullPath]) {
   throw new Error(
-    `"${fullPath}" image does not exist. Please check the path: "/src/assets/{,**/*}.{jpeg,jpg,png,gif,webp}"`
+    `"${fullPath}" image does not exist. Please check the path: "/src/assets/{,**/*}.{jpeg,jpg,png,gif,webp}"`,
   );
 }
 ---

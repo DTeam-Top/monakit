@@ -1,4 +1,8 @@
 ---
+import { getImage } from "astro:assets";
+import { getCollection, getEntry } from "astro:content";
+import { posix } from "node:path";
+import sitemap from "sitemap-ext:config";
 import { ImageViewer } from "@/components/image-viewer";
 import ContentNavigation from "@/components/navigation/ContentNavigation.astro";
 import ShareButtons from "@/components/ShareButtons.astro";
@@ -7,10 +11,6 @@ import { SITE_TITLE } from "@/consts";
 import MainLayout from "@/layouts/MainLayout.astro";
 import { getAdjacentContent } from "@/lib/navigation";
 import { formatDate } from "@/lib/utils";
-import { getImage } from "astro:assets";
-import { getCollection, getEntry } from "astro:content";
-import { posix } from "node:path";
-import sitemap from "sitemap-ext:config";
 
 // add all slides to sitemap
 sitemap(async ({ addToSitemap }) => {
@@ -19,7 +19,7 @@ sitemap(async ({ addToSitemap }) => {
   addToSitemap(
     slides.map((slide) => ({
       slug: slide.id,
-    }))
+    })),
   );
 });
 
@@ -61,15 +61,19 @@ const slideImageModules = import.meta.glob(
   {
     eager: true,
     import: "default",
-  }
+  },
 );
 
-const filePath = slide.filePath!; // e.g. src/content/slides/2025-09/my-slide.md
+const filePath = slide.filePath; // e.g. src/content/slides/2025-09/my-slide.md
 const localImagePaths =
   (slide.rendered?.metadata?.localImagePaths as Array<string>) ?? [];
 const imageMap = new Map<string, { webp: string; fallback: string }>();
 
 for (const rel of localImagePaths) {
+  if (!filePath) {
+    console.warn(`File path not available for slide: ${slide.id}`);
+    continue;
+  }
   const absolute = posix.join(posix.dirname(filePath), rel);
   const mod = slideImageModules[`/${absolute}`] as ImageMetadata;
   if (!mod) {
@@ -99,7 +103,7 @@ if (imageMap.size > 0) {
       return meta
         ? `${prefix}${meta.webp}${suffix}`
         : `${prefix}${relPath}${suffix}`;
-    }
+    },
   );
 }
 
