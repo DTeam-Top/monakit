@@ -1,6 +1,4 @@
 :root {
-  --scrolling-tags-hover-color: rgb(52 211 153);
-  --scrolling-tags-active-bg: rgb(34 197 94 / 0.9);
   --scrolling-tags-transition: all 0.2s ease;
   --scrolling-tags-hover-scale: 1.05;
   --scrolling-tags-active-scale: 0.98;
@@ -26,14 +24,14 @@
 
 .tags-bg .tag:hover,
 .tags-bg .tag.tag-hovered {
-  color: var(--scrolling-tags-hover-color);
+  color: hsl(var(--primary));
   transform: scale(var(--scrolling-tags-hover-scale));
   opacity: 1;
 }
 
 .tags-bg .tag:active {
   transform: scale(var(--scrolling-tags-active-scale));
-  background-color: var(--scrolling-tags-active-bg);
+  background-color: hsl(var(--primary) / 0.9);
 }
 
 @media (prefers-reduced-motion: reduce) {

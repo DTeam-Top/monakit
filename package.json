@@ -18,7 +18,8 @@
     "astro": "astro",
     "check": "astro check && biome check",
     "fix": "biome check --write",
-    "format": "biome format --write"
+    "format": "biome format --write",
+    "prepare": "husky"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
@@ -49,6 +50,7 @@
     "@types/pako": "^2.0.4",
     "@types/react": "^19.1.13",
     "@types/reveal.js": "^5.2.0",
+    "husky": "^9.1.7",
     "react-dom": "^19.1.1",
     "tailwindcss": "^4.1.13",
     "tsx": "^4.20.5",
