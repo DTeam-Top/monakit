@@ -235,7 +235,7 @@ const shareButtonClass = [
 </slot>
 
 {isPopup && (
-  <script>
+  <script is:inline>
     (() => {
       const currentScript = document.currentScript;
       if (!(currentScript instanceof HTMLScriptElement)) return;
