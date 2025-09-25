@@ -34,7 +34,11 @@ function readContentCollection(
 
   for (const entry of entries) {
     if (entry.isFile() && entry.name.endsWith(".md")) {
-      const filePath = join(entry.parentPath || fullPath, entry.name);
+      const filePath = join(
+        // biome-ignore lint/suspicious/noExplicitAny: Need to access 'path' property which may not exist in all @types/node versions
+        (entry as any).path ?? entry.parentPath,
+        entry.name,
+      );
       const content = readFileSync(filePath, "utf-8");
       const { data, content: body } = matter(content);
 

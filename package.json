@@ -12,9 +12,10 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "prebuild": "tsx scripts/build-pagefind-index.ts",
+    "prebuild": "pnpm run build:search-index",
     "build": "astro build",
     "build:analyze": "ANALYZE=true astro build",
+    "build:search-index": "tsx scripts/build-pagefind-index.ts",
     "preview": "astro preview",
     "astro": "astro",
     "check": "astro check && biome check",
