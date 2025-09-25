@@ -1,6 +1,6 @@
 # MonaKit
 
-An Astro-powered content site featuring multi-format content including knowledge cards, articles, and slide presentations.
+An Astro theme featuring multi-format content including knowledge cards, articles, and slide presentations.
 
 ## Features
 
@@ -15,6 +15,12 @@ An Astro-powered content site featuring multi-format content including knowledge
 - React 19 with Radix UI and Lucide icons
 - TailwindCSS 4
 - Pagefind for static search indexing
+
+## How to Use
+
+```bash
+npm create astro@latest my-astro-project -- --template monakit/monakit
+```
 
 ## Development
 
