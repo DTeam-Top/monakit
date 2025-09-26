@@ -1,3 +1,5 @@
+**ARCHIEVED**: USE https://github.com/monakit/monakit INSTEAD !!
+
 # MonaKit
 
 An Astro theme featuring multi-format content including knowledge cards, articles, and slide presentations.
